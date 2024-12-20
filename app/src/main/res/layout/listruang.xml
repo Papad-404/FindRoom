@@ -1,82 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:layout_marginHorizontal="10dp"
+    android:layout_marginVertical="10dp"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
     android:padding="20dp"
-    android:scrollbars="vertical">
+    android:id="@+id/recCard"
+    app:cardCornerRadius="15dp"
+    android:clickable="true"
+    >
 
-    <SearchView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
-
-    </SearchView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:padding="12dp"
+        android:background="#F4EFEF"
         >
 
-        <androidx.cardview.widget.CardView
+        <ImageView
+            android:id="@+id/recImage"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            app:cardCornerRadius="15dp"
-            android:layout_marginTop="12dp"
-            android:clickable="true"
-            >
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_launcher_background"
+            android:background="#64B165"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#F2EAEA"
-                android:padding="10dp"
-                >
+        <TextView
+            android:id="@+id/recRuang"
+            style="@style/TextAppearance.MaterialComponents.Headline3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Ruang 4.003"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_below="@id/recImage"
+            />
 
-                <ImageView
-                    android:id="@+id/image"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_launcher_background"
-                    android:background="#64B165"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    />
-
-                <TextView
-                    android:id="@+id/title"
-                    style="@style/TextAppearance.MaterialComponents.Headline3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Ruang 4.003"
-                    android:textColor="@color/black"
-                    android:textSize="20dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:layout_below="@id/image"
-                    />
-
-                <TextView
-                    android:id="@+id/subhead"
-                    style="@style/TextAppearance.MaterialComponents.Subtitle2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Available Now"
-                    android:textColor="@color/black"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/title"
-                    android:layout_below="@id/title"/>
-            </RelativeLayout>
-        </androidx.cardview.widget.CardView>
+        <TextView
+            android:id="@+id/recAvailable"
+            style="@style/TextAppearance.MaterialComponents.Subtitle2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Available Now"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recRuang"
+            android:layout_below="@id/recRuang"/>
 
 
     </LinearLayout>
-</LinearLayout>
+</androidx.cardview.widget.CardView>
