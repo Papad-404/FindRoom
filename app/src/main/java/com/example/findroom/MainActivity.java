@@ -1,6 +1,6 @@
 package com.example.findroom;
 
-import static com.example.findroom.R.id.navhome;
+import static com.example.findroom.R.id.navdashboard;
 
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -33,15 +33,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView = findViewById(R.id.nav_view);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
-        bottomNavigationView.setSelectedItemId(navhome);
+        bottomNavigationView.setSelectedItemId(navdashboard);
 
     }
 
 
-
     DashBoard dashBoard = new DashBoard();
-    Home home = new Home();
-    Notification notification = new Notification();
+    SearchAct searchAct = new SearchAct();
+    Booked booked = new Booked();
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -52,17 +51,17 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     .commit();
             return true;
 
-        }else if(item.getItemId() == R.id.navhome){
+        }else if(item.getItemId() == R.id.navsearch){
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.flFragment, home)
+                    .replace(R.id.flFragment, searchAct)
                     .commit();
             return true;
 
-        }else if(item.getItemId() == R.id.navnotifications){
+        }else if(item.getItemId() == R.id.navsave){
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.flFragment, notification)
+                    .replace(R.id.flFragment, booked)
                     .commit();
             return true;
 

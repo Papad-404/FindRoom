@@ -14,7 +14,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,22 +33,25 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class DashBoard extends Fragment {
-
+public class SearchAct extends Fragment {
     RecyclerView recyclerView;
     RoomAdapter roomAdapter;
     ArrayList<DataRoom> roomList;
+    ImageView imageView;
+
     boolean isAvailable = true;
 
-    public DashBoard() {
+
+    public SearchAct() {
         // Required empty public constructor
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_dash_board, container, false);
+        return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
     @Override
@@ -61,91 +67,71 @@ public class DashBoard extends Fragment {
         roomAdapter = new RoomAdapter(getContext(), roomList);
         recyclerView.setAdapter(roomAdapter);
 
+        Spinner spinnerTimeRange = view.findViewById(R.id.timeSpinner);
+        ImageButton btnSearch = view.findViewById(R.id.searchButton);
+        ArrayAdapter<CharSequence> timeAdapter;
+        // 3 SKS selected
+        timeAdapter = ArrayAdapter.createFromResource(getContext(),
+                    R.array.time_range_3_sks, android.R.layout.simple_spinner_item);
 
-        // Fetch all rooms initially
-        fetchAllRooms();
+        timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerTimeRange.setAdapter(timeAdapter);
+
+
+        // Search button click listener
+        btnSearch.setOnClickListener(v -> {
+            String selectedTimeRange = spinnerTimeRange.getSelectedItem().toString();
+            filterRooms(selectedTimeRange);
+            Log.d("SelectedTimeRange", "Selected Time Range: " + selectedTimeRange);
+
+            roomAdapter.setSelectedTimeRange(selectedTimeRange);
+
+        });
 
 
     }
 
-    private void fetchAllRooms() {
-
-        TimeZone timeZone = TimeZone.getTimeZone("Asia/Jakarta");
-        // Create Calendar instance with WIB timezone
-        Calendar calendar = Calendar.getInstance(timeZone);
-
-        // Set the locale to Indonesian for formatting the day
-        Locale indonesiaLocale = new Locale("id", "ID"); // Indonesian locale
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE", indonesiaLocale);
-        sdf.setTimeZone(timeZone);
-        // Get current day and time
-        String currentDay = sdf.format(calendar.getTime());
-
-        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);  // Current hour in 24-hour format
-        int currentMinute = calendar.get(Calendar.MINUTE);  // Current minute
-        String currentTime = String.format(Locale.getDefault(), "%02d:%02d", currentHour, currentMinute);
-
-
+    private void filterRooms(String selectedTimeRange) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Ruang");
 
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                roomList.clear();
-                Log.d("FirebaseData", "DataSnapshot: " + dataSnapshot.toString());
+                roomList.clear();  // Clear the list for filtered data
+                String[] times = selectedTimeRange.split("-");
+                String filterStartTime = times[0];
+                String filterEndTime = times[1];
 
                 for (DataSnapshot roomSnapshot : dataSnapshot.getChildren()) {
-                    String nomor = roomSnapshot.getKey();
-                    Log.d("RoomName", "Room: " + nomor);
+                    String roomNumber = roomSnapshot.getKey();
+                    boolean isAvailable = false;
 
-                    DataSnapshot daySnapshot = roomSnapshot.child(currentDay);
-                    if (daySnapshot.exists()) {
-                        Log.d("DaySnapshot", "Day snapshot exists for room " + nomor);
-
-
+                    // Check availability for the selected time range
+                    for (DataSnapshot daySnapshot : roomSnapshot.getChildren()) {
                         for (DataSnapshot timeSlotSnapshot : daySnapshot.getChildren()) {
                             String timeSlot = timeSlotSnapshot.getKey();
                             Boolean available = timeSlotSnapshot.child("available").getValue(Boolean.class);
 
-                            if (available == null) {
-                                Log.d("AvailableField", "Available field is null for timeslot: " + timeSlot);
-                                available = false;
-                            }
-
-                            Log.d("TimeSlot", "Timeslot: " + timeSlot + ", Available: " + available);
-
-                            // Split the timeSlot into start and end times (e.g., "07:30" and "10:00")
-                            String[] times = timeSlot.split("-");
-                            String startTime = times[0];
-                            String endTime = times[1];
-
-                            if (available != null && available && isCurrentTimeWithinRange(currentTime, startTime, endTime)) {
-                                Log.d("AvailableRoom", "Room " + nomor + " is available from " + startTime + " to " + endTime);
-                                // Add the available room to the list
+                            if (available != null && available && isCurrentTimeWithinRange(timeSlot, filterStartTime, filterEndTime)) {
                                 isAvailable = true;
                                 break;
                             }
                         }
+                    }
 
-                        roomList.add(new DataRoom(nomor, isAvailable));
-                    } else {
-                        Log.d("DaySnapshot", "No data for day " + currentDay + " for room " + nomor);
+                    // Add only available rooms
+                    if (isAvailable) {
+                        roomList.add(new DataRoom(roomNumber, true));
                     }
                 }
-
-                // Log the size of the room list
-                Log.d("RoomListSize", "Room List Size: " + roomList.size());
-
-                // Notify the adapter that the data has changed
-                roomAdapter.notifyDataSetChanged();
+                roomAdapter.notifyDataSetChanged();  // Refresh the RecyclerView
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.w(TAG, "Failed to read value.", error.toException());
             }
-
         });
     }
 
@@ -179,4 +165,6 @@ public class DashBoard extends Fragment {
             return false;
         }
     }
+
+
 }

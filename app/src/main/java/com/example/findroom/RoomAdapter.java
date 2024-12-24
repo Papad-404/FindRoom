@@ -1,7 +1,9 @@
 package com.example.findroom;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +20,18 @@ import java.util.List;
 public class RoomAdapter extends RecyclerView.Adapter<RoomViewHolder> {
     Context context;
     List<DataRoom> roomList;
+    private String selectedTimeRange;
+
+    private String currentDays;
 
     public RoomAdapter(Context context, List<DataRoom> roomList) {
         this.context = context;
         this.roomList = roomList;
     }
 
+    public void setSelectedTimeRange(String selectedTimeRange) {
+        this.selectedTimeRange = selectedTimeRange;
+    }
 
 
     @NonNull
@@ -37,9 +45,8 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomViewHolder> {
     public void onBindViewHolder(@NonNull RoomViewHolder holder, int position) {
         DataRoom room = roomList.get(position);
 
-        holder.recImage.setImageResource(R.drawable.ic_launcher_background);
+        holder.recImage.setImageResource(R.drawable.wp34299063);
         holder.recRuang.setText(room.getNomor());
-
 
         if (room.isAvailable()) {
             holder.recAvailable.setText("Available Now");
@@ -49,6 +56,13 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomViewHolder> {
                 holder.recAvailable.setText("Not Available");
                 holder.recAvailable.setTextColor(Color.RED);
         }
+        holder.recCard.setOnClickListener(v -> {
+            Intent intent = new Intent(context, Summary.class);
+            intent.putExtra("roomId", room.getNomor());
+            intent.putExtra("selectedTimeRange", selectedTimeRange);
+            context.startActivity(intent);
+        });
+
 
 
     }
@@ -57,6 +71,13 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomViewHolder> {
     public int getItemCount() {
         return roomList.size();
     }
+
+    public void updateList(ArrayList<DataRoom> newList) {
+        this.roomList = newList;
+        notifyDataSetChanged();
+    }
+
+
 }
 
 class RoomViewHolder extends RecyclerView.ViewHolder {
@@ -64,7 +85,6 @@ class RoomViewHolder extends RecyclerView.ViewHolder {
     TextView recRuang;
     TextView recAvailable;
     CardView recCard;
-
 
     public RoomViewHolder(@NonNull View itemView) {
         super(itemView);
